@@ -81,10 +81,10 @@ $(ATF)/$(BL31): .config FORCE | $(ATF)
 		BUILD_MESSAGE_TIMESTAMP='"$(DATE)"' PLAT=$(PLAT) \
 		bl31
 
-$(SCP)/build/scp.bin: $(SCP)/.config FORCE | $(SCP)
+$(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_or1k) \
-		build/scp.bin
+		build/scp/scp.bin
 
 %/spl/sunxi-spl.bin %/u-boot.itb: %/.config \
 		$(OUTDIR)/bl31.bin $(OUTDIR)/scp.bin FORCE | %
@@ -107,7 +107,7 @@ $(OUTDIR)/bl31.bin: $(ATF)/$(BL31) | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-$(OUTDIR)/scp.bin: $(SCP)/build/scp.bin | $(OUTDIR)
+$(OUTDIR)/scp.bin: $(SCP)/build/scp/scp.bin | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
