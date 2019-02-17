@@ -13,7 +13,6 @@ U-BOOT_URL	 = https://github.com/crust-firmware/u-boot
 
 BUILDDIR	?= build
 OUTDIR		 = $(BUILDDIR)/$(BOARD)
-OUTFILE		 = $(BUILDDIR)/firmware_$(BOARD).img
 
 # Cross compiler
 CROSS_aarch64	 = aarch64-linux-musl-
@@ -39,14 +38,14 @@ DATE = $(if $(filter-out 0,$(REPRODUCIBLE)),0,$(shell stat -c '%Y' .config))
 M := @$(if $(filter-out 0,$(V)),:,printf '  %-7s %s\n')
 Q :=  $(if $(filter-out 0,$(V)),,@)
 
-all: $(OUTFILE)
+all: $(OUTDIR)/u-boot-sunxi-spi.img $(OUTDIR)/u-boot-sunxi-with-spl.bin
 	$(M) DONE
 
 clean:
 	$(Q) $(MAKE) -C $(ATF) clean
 	$(Q) $(MAKE) -C $(SCP) clean
 	$(Q) $(MAKE) -C $(U-BOOT) clean
-	$(Q) rm -fr $(OUTDIR) $(OUTFILE)
+	$(Q) rm -fr $(OUTDIR)
 	$(Q) rmdir $(BUILDDIR) 2>/dev/null || true
 
 distclean:
@@ -86,13 +85,13 @@ $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_or1k) \
 		build/scp/scp.bin
 
-%/spl/sunxi-spl.bin %/u-boot.itb: %/.config \
+%/spl/sunxi-spl.bin %/u-boot.itb %/u-boot-sunxi-with-spl.bin: %/.config \
 		$(OUTDIR)/bl31.bin $(OUTDIR)/scp.bin FORCE | %
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
 		BL31=$(CURDIR)/$(OUTDIR)/bl31.bin SOURCE_DATE_EPOCH=$(DATE) \
 		SCP=$(CURDIR)/$(OUTDIR)/scp.bin \
-		spl/sunxi-spl.bin u-boot.itb
+		spl/sunxi-spl.bin u-boot.itb u-boot-sunxi-with-spl.bin
 
 $(BUILDDIR) $(OUTDIR):
 	$(M) MKDIR $@
@@ -119,7 +118,7 @@ $(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot.itb | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-$(OUTFILE): $(OUTDIR)/blank.img \
+$(OUTDIR)/u-boot-sunxi-spi.img: $(OUTDIR)/blank.img \
 		$(OUTDIR)/sunxi-spl.bin $(OUTDIR)/u-boot.itb | $(BUILDDIR)
 	$(M) DD $@
 	$(Q) cp -f $< $@.tmp
@@ -128,6 +127,11 @@ $(OUTFILE): $(OUTDIR)/blank.img \
 	$(Q) dd bs=$(SPL_SIZE_KB)k conv=notrunc \
 		if=$(OUTDIR)/u-boot.itb of=$@.tmp seek=1 2>/dev/null
 	$(Q) mv -f $@.tmp $@
+
+$(OUTDIR)/u-boot-sunxi-with-spl.bin: $(U-BOOT)/u-boot-sunxi-with-spl.bin | \
+		$(OUTDIR)
+	$(M) CP $@
+	$(Q) cp -f $< $@
 
 FORCE:
 
