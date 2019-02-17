@@ -27,7 +27,7 @@ REPRODUCIBLE	?= 0
 BOARD		?= orangepi_zero_plus
 
 # Board-specific options
-PLAT		 = sun50i
+PLAT		 = sun50i_a64
 FLASH_SIZE_KB	 = 2048
 SPL_SIZE_KB	 = 32
 
