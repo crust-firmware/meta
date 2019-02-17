@@ -38,7 +38,7 @@ DATE = $(if $(filter-out 0,$(REPRODUCIBLE)),0,$(shell stat -c '%Y' .config))
 M := @$(if $(filter-out 0,$(V)),:,printf '  %-7s %s\n')
 Q :=  $(if $(filter-out 0,$(V)),,@)
 
-all: $(OUTDIR)/u-boot-sunxi-spi.img $(OUTDIR)/u-boot-sunxi-with-spl.bin
+all: $(OUTDIR)/sha256sums $(OUTDIR)/sha512sums
 	$(M) DONE
 
 clean:
@@ -132,6 +132,18 @@ $(OUTDIR)/u-boot-sunxi-with-spl.bin: $(U-BOOT)/u-boot-sunxi-with-spl.bin | \
 		$(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
+
+%/sha256sums: %/bl31.bin %/scp.bin %/sunxi-spl.bin %/u-boot.itb \
+		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
+	$(M) SHA256 $@
+	$(Q) cd $(dir $@) && sha256sum -b $(notdir $^) > $(notdir $@).tmp
+	$(Q) mv -f $@.tmp $@
+
+%/sha512sums: %/bl31.bin %/scp.bin %/sunxi-spl.bin %/u-boot.itb \
+		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
+	$(M) SHA512 $@
+	$(Q) cd $(dir $@) && sha512sum -b $(notdir $^) > $(notdir $@).tmp
+	$(Q) mv -f $@.tmp $@
 
 FORCE:
 
