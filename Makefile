@@ -98,7 +98,7 @@ $(BUILDDIR) $(OUTDIR):
 	$(M) MKDIR $@
 	$(Q) mkdir -p $@
 
-$(OUTDIR)/blank.img: | $(OUTDIR)
+$(BUILDDIR)/blank.img: | $(OUTDIR)
 	$(M) DD $@
 	$(Q) dd count=1 ibs=$(FLASH_SIZE_KB)k if=/dev/zero | \
 		tr '\0' '\377' >$@ 2>/dev/null
@@ -119,7 +119,7 @@ $(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot.itb | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-$(OUTDIR)/u-boot-sunxi-spi.img: $(OUTDIR)/blank.img \
+$(OUTDIR)/u-boot-sunxi-spi.img: $(BUILDDIR)/blank.img \
 		$(OUTDIR)/sunxi-spl.bin $(OUTDIR)/u-boot.itb | $(BUILDDIR)
 	$(M) DD $@
 	$(Q) cp -f $< $@.tmp
