@@ -23,7 +23,7 @@ DEBUG		?= 0
 REPRODUCIBLE	?= 0
 
 # Board selection
-BOARD		?= orangepi_zero_plus
+BOARD		?= pinebook
 
 # Board-specific options
 PLAT		 = sun50i_a64
