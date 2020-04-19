@@ -77,7 +77,9 @@ $(U-BOOT):
 $(ATF)/$(BL31): .config FORCE | $(ATF)
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
-		BUILD_MESSAGE_TIMESTAMP='"$(DATE)"' PLAT=$(PLAT) \
+		BUILD_MESSAGE_TIMESTAMP='"$(DATE)"' \
+		DEBUG=$(DEBUG) \
+		PLAT=$(PLAT) \
 		bl31
 
 $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
