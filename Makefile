@@ -83,6 +83,7 @@ $(ATF)/$(BL31): .config FORCE | $(ATF)
 $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_or1k) \
+		HOST_COMPILE=$(CROSS_aarch64) \
 		build/scp/scp.bin
 
 %/spl/sunxi-spl.bin %/u-boot.itb %/u-boot-sunxi-with-spl.bin: %/.config \
