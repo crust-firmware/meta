@@ -20,7 +20,7 @@ CROSS_or1k	 = or1k-linux-musl-
 
 # General options
 DEBUG		?= 0
-REPRODUCIBLE	?= 0
+REPRODUCIBLE	?= 1
 
 # Board selection
 BOARD		?= pinebook
