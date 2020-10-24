@@ -88,14 +88,14 @@ $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 		HOST_COMPILE=$(CROSS_aarch64) \
 		build/scp/scp.bin
 
-%/spl/sunxi-spl.bin %/u-boot.itb %/u-boot-sunxi-with-spl.bin: %/.config \
+%/spl/sunxi-spl.bin %/u-boot-sunxi-with-spl.fit.fit %/u-boot-sunxi-with-spl.bin: %/.config \
 		$(OUTDIR)/bl31.bin $(OUTDIR)/scp.bin FORCE | %
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
 		BL31=$(CURDIR)/$(OUTDIR)/bl31.bin \
 		SCP=$(CURDIR)/$(OUTDIR)/scp.bin \
 		SOURCE_DATE_EPOCH=$(DATE) \
-		spl/sunxi-spl.bin u-boot.itb u-boot-sunxi-with-spl.bin
+		all
 
 $(BUILDDIR) $(OUTDIR):
 	$(M) MKDIR $@
@@ -118,7 +118,7 @@ $(OUTDIR)/sunxi-spl.bin: $(U-BOOT)/spl/sunxi-spl.bin | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-$(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot.itb | $(OUTDIR)
+$(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot-sunxi-with-spl.fit.fit | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
