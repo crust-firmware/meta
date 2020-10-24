@@ -26,9 +26,14 @@ REPRODUCIBLE	?= 0
 BOARD		?= pinebook
 
 # Board-specific options
-PLAT		 = sun50i_a64
-FLASH_SIZE_KB	 = 2048
-SPL_SIZE_KB	 = 32
+PLAT		 = $(or $(PLAT_$(BOARD)),sun50i_a64)
+FLASH_SIZE_KB	 = $(or $(FLASH_SIZE_KB_$(BOARD)),2048)
+SPL_SIZE_KB	 = $(or $(SPL_SIZE_KB_$(BOARD)),32)
+
+# Board-specific overrides
+PLAT_orangepi_3			 = sun50i_h6
+PLAT_pine_h64			 = sun50i_h6
+FLASH_SIZE_KB_pine_h64		 = 16384
 
 ###############################################################################
 
