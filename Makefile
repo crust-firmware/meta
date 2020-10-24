@@ -92,8 +92,8 @@ $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 		$(OUTDIR)/bl31.bin $(OUTDIR)/scp.bin FORCE | %
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
-		BL31=$(CURDIR)/$(OUTDIR)/bl31.bin \
-		SCP=$(CURDIR)/$(OUTDIR)/scp.bin \
+		BL31=$(abspath $(OUTDIR)/bl31.bin) \
+		SCP=$(abspath $(OUTDIR)/scp.bin) \
 		SOURCE_DATE_EPOCH=$(DATE) \
 		all
 
