@@ -114,7 +114,15 @@ $(OUTDIR)/scp.bin: $(SCP)/build/scp/scp.bin | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
+$(OUTDIR)/scp.config: $(SCP)/.config | $(OUTDIR)
+	$(M) CP $@
+	$(Q) cp -f $< $@
+
 $(OUTDIR)/sunxi-spl.bin: $(U-BOOT)/spl/sunxi-spl.bin | $(OUTDIR)
+	$(M) CP $@
+	$(Q) cp -f $< $@
+
+$(OUTDIR)/u-boot.config: $(U-BOOT)/.config | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
@@ -138,13 +146,15 @@ $(OUTDIR)/u-boot-sunxi-with-spl.bin: $(U-BOOT)/u-boot-sunxi-with-spl.bin | \
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-%/sha256sums: %/bl31.bin %/scp.bin %/sunxi-spl.bin %/u-boot.itb \
+%/sha256sums: %/bl31.bin %/scp.bin %/scp.config \
+		%/sunxi-spl.bin %/u-boot.config %/u-boot.itb \
 		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
 	$(M) SHA256 $@
 	$(Q) cd $(dir $@) && sha256sum -b $(notdir $^) > $(notdir $@).tmp
 	$(Q) mv -f $@.tmp $@
 
-%/sha512sums: %/bl31.bin %/scp.bin %/sunxi-spl.bin %/u-boot.itb \
+%/sha512sums: %/bl31.bin %/scp.bin %/scp.config \
+		%/sunxi-spl.bin %/u-boot.config %/u-boot.itb \
 		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
 	$(M) SHA512 $@
 	$(Q) cd $(dir $@) && sha512sum -b $(notdir $^) > $(notdir $@).tmp
