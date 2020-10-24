@@ -123,7 +123,7 @@ $(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot-sunxi-with-spl.fit.fit | $(OUTDIR)
 	$(Q) cp -f $< $@
 
 $(OUTDIR)/u-boot-sunxi-spi.img: $(BUILDDIR)/blank.img \
-		$(OUTDIR)/sunxi-spl.bin $(OUTDIR)/u-boot.itb | $(BUILDDIR)
+		$(OUTDIR)/sunxi-spl.bin $(OUTDIR)/u-boot.itb | $(OUTDIR)
 	$(M) DD $@
 	$(Q) cp -f $< $@.tmp
 	$(Q) dd bs=$(SPL_SIZE_KB)k conv=notrunc \
