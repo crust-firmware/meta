@@ -101,11 +101,6 @@ $(BUILDDIR) $(OUTDIR):
 	$(M) MKDIR $@
 	$(Q) mkdir -p $@
 
-$(BUILDDIR)/blank.img: | $(OUTDIR)
-	$(M) DD $@
-	$(Q) dd count=1 ibs=$(FLASH_SIZE_KB)k if=/dev/zero | \
-		tr '\0' '\377' >$@ 2>/dev/null
-
 $(OUTDIR)/bl31.bin: $(ATF)/$(BL31) | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
@@ -122,10 +117,11 @@ $(OUTDIR)/u-boot.itb: $(U-BOOT)/u-boot-sunxi-with-spl.fit.fit | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-$(OUTDIR)/u-boot-sunxi-spi.img: $(BUILDDIR)/blank.img \
+$(OUTDIR)/u-boot-sunxi-spi.img: \
 		$(OUTDIR)/sunxi-spl.bin $(OUTDIR)/u-boot.itb | $(OUTDIR)
 	$(M) DD $@
-	$(Q) cp -f $< $@.tmp
+	$(Q) dd bs=$(FLASH_SIZE_KB)k count=1 if=/dev/zero 2>/dev/null | \
+		tr '\0' '\377' >$@.tmp
 	$(Q) dd bs=$(SPL_SIZE_KB)k conv=notrunc \
 		if=$(OUTDIR)/sunxi-spl.bin of=$@.tmp 2>/dev/null
 	$(Q) dd bs=$(SPL_SIZE_KB)k conv=notrunc \
