@@ -15,6 +15,7 @@ BUILDDIR	?= build
 OUTDIR		 = $(BUILDDIR)/$(BOARD)
 
 # Cross compiler
+CROSS_aarch32	 = arm-linux-musleabi-
 CROSS_aarch64	 = aarch64-linux-musl-
 CROSS_or1k	 = or1k-linux-musl-
 
@@ -26,6 +27,7 @@ REPRODUCIBLE	?= 1
 BOARD		?= pinebook
 
 # Board-specific options
+ARCH		 = $(or $(ARCH_$(BOARD)),aarch64)
 PLAT		 = $(or $(PLAT_$(BOARD)),sun50i_a64)
 FLASH_SIZE_KB	 = $(or $(FLASH_SIZE_KB_$(BOARD)),2048)
 SPL_SIZE_KB	 = $(or $(SPL_SIZE_KB_$(BOARD)),32)
@@ -37,7 +39,9 @@ FLASH_SIZE_KB_pine_h64		 = 16384
 
 ###############################################################################
 
-BL31 = build/$(PLAT)/$(if $(filter-out 0,$(DEBUG)),debug,release)/bl31.bin
+BUILD_TYPE = $(if $(filter-out 0,$(DEBUG)),debug,release)
+
+BL3X = $(if $(findstring aarch64,$(ARCH)),bl31,bl32).bin
 DATE = $(if $(filter-out 0,$(REPRODUCIBLE)),0,$(shell stat -c '%Y' .config))
 
 M := @$(if $(filter-out 0,$(V)),:,printf '  %-7s %s\n')
@@ -79,27 +83,28 @@ $(U-BOOT):
 	$(M) CONFIG $|
 	$(Q) $(MAKE) -C $| $(BOARD)_defconfig
 
-$(ATF)/$(BL31): .config FORCE | $(ATF)
+$(ATF)/build/$(PLAT)/$(BUILD_TYPE)/$(BL3X): .config FORCE | $(ATF)
 	$(M) MAKE $@
-	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
+	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_$(ARCH)) \
+		ARCH=$(ARCH) \
 		BUILD_MESSAGE_TIMESTAMP='"$(DATE)"' \
 		DEBUG=$(DEBUG) \
 		PLAT=$(PLAT) \
-		bl31
+		$(basename $(BL3X))
 
 $(SCP)/build/scp/scp.bin: $(SCP)/.config FORCE | $(SCP)
 	$(M) MAKE $@
 	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_or1k) \
-		HOST_COMPILE=$(CROSS_aarch64) \
+		HOST_COMPILE=$(CROSS_$(ARCH)) \
 		build/scp/scp.bin
 
 $(U-BOOT)/spl/sunxi-spl.bin: $(U-BOOT)/u-boot-sunxi-with-spl.bin;
 
 $(U-BOOT)/u-boot-sunxi-with-spl.bin: $(U-BOOT)/.config \
-		$(OUTDIR)/bl31.bin $(OUTDIR)/scp.bin FORCE | $(U-BOOT)
+		$(OUTDIR)/$(BL3X) $(OUTDIR)/scp.bin FORCE | $(U-BOOT)
 	$(M) MAKE $@
-	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_aarch64) \
-		BL31=$(abspath $(OUTDIR)/bl31.bin) \
+	$(Q) $(MAKE) -C $| CROSS_COMPILE=$(CROSS_$(ARCH)) \
+		BL31=$(abspath $(OUTDIR)/$(BL3X)) \
 		SCP=$(abspath $(OUTDIR)/scp.bin) \
 		SOURCE_DATE_EPOCH=$(DATE) \
 		all
@@ -110,7 +115,7 @@ $(BUILDDIR) $(OUTDIR):
 	$(M) MKDIR $@
 	$(Q) mkdir -p $@
 
-$(OUTDIR)/bl31.bin: $(ATF)/$(BL31) | $(OUTDIR)
+$(OUTDIR)/$(BL3X): $(ATF)/build/$(PLAT)/$(BUILD_TYPE)/$(BL3X) | $(OUTDIR)
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
@@ -150,14 +155,14 @@ $(OUTDIR)/u-boot-sunxi-with-spl.bin: $(U-BOOT)/u-boot-sunxi-with-spl.bin | \
 	$(M) CP $@
 	$(Q) cp -f $< $@
 
-%/sha256sums: %/bl31.bin %/scp.bin %/scp.config \
+%/sha256sums: %/$(BL3X) %/scp.bin %/scp.config \
 		%/sunxi-spl.bin %/u-boot.config %/u-boot.itb \
 		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
 	$(M) SHA256 $@
 	$(Q) cd $(dir $@) && sha256sum -b $(notdir $^) > $(notdir $@).tmp
 	$(Q) mv -f $@.tmp $@
 
-%/sha512sums: %/bl31.bin %/scp.bin %/scp.config \
+%/sha512sums: %/$(BL3X) %/scp.bin %/scp.config \
 		%/sunxi-spl.bin %/u-boot.config %/u-boot.itb \
 		%/u-boot-sunxi-spi.img %/u-boot-sunxi-with-spl.bin
 	$(M) SHA512 $@
