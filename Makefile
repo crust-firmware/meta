@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Samuel Holland <samuel@sholland.org>
+# Copyright © 2017-2020 Samuel Holland <samuel@sholland.org>
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
