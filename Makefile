@@ -75,7 +75,7 @@ $(U-BOOT):
 	$(M) CLONE $@
 	$(Q) git clone $(U-BOOT_URL) $@
 
-%/.config: .config | %
+%/.config: .config %/configs/$(BOARD)_defconfig | %
 	$(M) CONFIG $|
 	$(Q) $(MAKE) -C $| $(BOARD)_defconfig
 
