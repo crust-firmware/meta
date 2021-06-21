@@ -9,7 +9,7 @@ ATF_URL		 = https://github.com/crust-firmware/arm-trusted-firmware
 SCP		 = crust
 SCP_URL		 = https://github.com/crust-firmware/crust
 U-BOOT		 = u-boot
-U-BOOT_URL	 = https://github.com/crust-firmware/u-boot
+U-BOOT_URL	 = https://github.com/u-boot/u-boot
 
 BUILDDIR	?= build
 OUTDIR		 = $(BUILDDIR)/$(BOARD)
